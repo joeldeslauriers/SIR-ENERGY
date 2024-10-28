@@ -1,0 +1,26 @@
+C:.
+│   .env
+│   app.js
+│   package-lock.json
+│   package.json
+│
+├───models
+│       departmentModel.js
+│
+├───node_modules
+├───public
+│   │   department.html
+│   │   index.html
+│   │   styles.css
+│   │
+│   ├───img
+│   │       logo.png
+│   │       logo2.webp
+│   │       logo3.png
+│   │       sir.png
+│   │
+│   └───js
+│           DepartmentView.js
+│
+└───routes
+        departmentRoutes.js

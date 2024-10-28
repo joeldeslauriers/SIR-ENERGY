@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Departments</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to the new CSS file -->
+</head>
+<body>
+        <!-- Banner Section -->
+        <div class="banner">
+            <h1>Departments</h1>
+            <img src="./img/sir.png" alt="Logo" class="logo"> <!-- Replace with your logo path -->    
+        </div>
+    <form id="department-form">
+        <input type="text" id="department-number" placeholder="Department Number" required>
+        <input type="text" id="department-name" placeholder="Department Name" required>
+        <button type="submit">Add Department</button>
+    </form>
+
+    <table id="departments-table">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const form = document.getElementById('department-form');
+        const tableBody = document.getElementById('departments-table').querySelector('tbody');
+
+        async function fetchDepartments() {
+            const response = await fetch('/api/departments');
+            const departments = await response.json();
+            console.log(departments); // Log the response to inspect its structure
+            tableBody.innerHTML = '';
+            departments.forEach(department => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${department.department_number}</td>
+                    <td contenteditable="true" data-id="${department.id}">${department.name}</td>
+                    <td>
+                        <button onclick="updateDepartment(${department.id})">Update</button>
+                        <button onclick="deleteDepartment(${department.id})">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        async function addDepartment(departmentNumber, departmentName) {
+            await fetch('/api/departments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ department_number: departmentNumber, department_name: departmentName }),
+            });
+            fetchDepartments();
+        }
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const departmentNumber = document.getElementById('department-number').value;
+            const departmentName = document.getElementById('department-name').value;
+            addDepartment(departmentNumber, departmentName);
+            form.reset();
+        });
+
+        async function updateDepartment(id) {
+            const departmentName = document.querySelector(`[data-id='${id}']`).innerText;
+            await fetch(`/api/departments/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ department_name: departmentName }),
+            });
+            fetchDepartments();
+        }
+
+        async function deleteDepartment(id) {
+            await fetch(`/api/departments/${id}`, {
+                method: 'DELETE',
+            });
+            fetchDepartments();
+        }
+
+        // Initial fetch
+        fetchDepartments();
+    </script>
+</body>
+</html>
